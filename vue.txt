@@ -1,0 +1,1244 @@
+
+___________________________________________________________________________________________________________________
+
+Создание приложения на Vue JS
+
+
+1. Создание проекта в адресной строке папки вызвать команду cmd и прописать в командной строке команду: cd <название папки для создания проекта>;
+2. Команада - create vue <name project> - создает проект в указанной папке ранее;
+3. Выбираем команду: Manually select features;
+4. Оставляем звездочку только напротив: Babel;
+5. Дальше выбираем: In didicated config file;
+6. <y/n> - Выбираем n (то есть не сохранять пресет, пресет - это временные конфигурационные настройки проекта);
+7. Запускаем npm в директории: npm run serve (получение ip адресса сервера, команда serve является сокращением от команды server);
+
+___________________________________________________________________________________________________________________
+
+Теория 
+
+node.js ==   npm   | => файловый секретарь, за исключением того что npm лучше в скорости обработки
+node.js ==   yarn  | 
+
+Babel.js => ретранслятор кода в более поздние версии js, например ES6 => ES5
+Eslint => позволяет недопускать грубых семантических ошибок в js коде и не приводить к сбоям работы проекта
+WEBPACK => файловый сборщих
+
+
+___________________________________________________________________________________________________________________
+
+Подключение SAAS/SCSS файлов
+
+1) Создаем в папке assets => папку scss => в ней 2 файла: {main.scss; variable.scss}
+2) Создаем файл vue.config.js в главной папке проекта:
+3) В этом файле указываем следующее:
+
+module.exports = {
+    css: {
+        loaderOptions: {
+            sass: {
+                additionalData: ' @import "@/assets/scss/main.scss";'
+            }
+        }
+    }
+}
+
+
+
+4) Вызываем cmd и прописываем:
+
+npm install sass-loader node-sass --save-dev
+
+vue-template-compiler
+
+npm install --save-dev sass-loader@7.1.0 <= понизить до указанной версии
+
+
+___________________________________________________________________________________________________________________
+
+Обновление пакетов
+npm i
+___________________________________________________________________________________________________________________
+
+Обновление пакетов
+npm uninstall <название пакета, который необходимо удалить> --save
+
+___________________________________________________________________________________________________________________
+
+Базовые фичи Vue CLI:
+
+1) Vue CLI есть префикс @ - он указывает на папку src
+2) Чобы передавать от родителького компонента данные - дочернему компоненту, необходимо прописывать следующую конструкцию:
+
+В родительском компоненте создать тег с указанным компонентом:
+
+<Message v-if="message" style="color: red;" :message="Hello Message!"/>
+
+Дальше прописывам атрибут message, с параметрами в ковычках
+
+В дочернем компоненте регаем:
+
+<script>
+export default {
+    props: {
+        message: {
+            type: String,
+            required: true
+        }
+    }
+}
+</script>
+Props - это объект с передаваемыми параметрами атрибутов, используется при передаче данных от род. дочерним компонентам
+В props - указываем имя атрибута
+В объекте message указываем два необходимых параметра type и required,
+type может быть: Array, Object, Boolean, Number, String
+
+3) $emit - позволяет передавать функции дочерним компонентам в обьекте props
+
+<script>
+export default {
+    props: {
+        note: {
+            type: Object,
+            required: true
+        }
+    },
+    methods: {
+        addPost () {
+            this.$emit('addPost', this.note)
+            this.$emit('<название функции emit>', <что хотим передвать>)
+        },
+    }
+}
+</script> 
+
+4) scoped - параметр для стилей, который указывает, что стили должны применять только к этому компоненту, где они объявлены (то есть ограничивает область видимости стилей)
+
+___________________________________________________________________________________________________________________
+
+Как перенести проект:
+
+1) Заходим в vue-cli
+2) Копируем все кроме node_modules
+3) Заходим VSCode
+4) Открываем в текущем проекте cd
+5) Запускаем программу обновления пакетов: npm i
+
+___________________________________________________________________________________________________________________
+
+Router ::
+
+1) Установка роутера для vue-cli::
+
+npm install vue-router --save
+
+2) Переходим в main.js ::
+
+import router from './routes'
+
+
+3) ::
+
+Vue.config.productionTip = false
+
+new Vue({			
+  router, <= закинули роутер сюда обязательно!!!
+  render: function (h) { return h(App) },
+}).$mount('#app')
+
+
+4) Создаем папку в src => под названием => pages => в нее кладем файлы ::
+	Home.vue
+	Example.vue
+
+
+5) Создаем по соседству с main.js файл routes.js (где описываем сам router) ::
+
+// default
+
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+// Pages
+
+import Home from '@/pages/Home.vue'
+import Example from '@/pages/Example.vue'
+
+
+// Routering
+
+export default new Router ({
+    routes: [
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/example',
+            name: 'example',
+            component: Example
+        },
+    ]
+}) 
+
+
+
+
+
+6) Каждый наш роут = это новый объект, который входит в состав массива роутеров, класса Router;
+	у каждого объекта роутера должно быть минимум три параметра:
+
+	export default new Router ({
+    routes: [
+        {
+            path: '/', <= это путь до указанной страницы
+            name: 'home', <= это то как она будет навзана в адрессной строке
+            component: Home <= это то навазние, которое указано в import
+        }
+    ]
+})
+
+
+7) Создать в файле App.vue следующий компонент (создавать внутри template и div) ::
+
+<router-view></router-view>
+
+
+<template>
+  <div id="app">
+
+    <Header />
+    
+
+<router-view></router-view>
+
+   <Footer />
+
+  </div>
+</template>
+
+
+___________________________________________________________________________________________________________________
+
+Динамические ссылки :: router-link
+
+<li><router-link href="#" class="text-white" to="/">Page Home</router-link></li>
+<li><router-link href="#" class="text-white" to="/example" <= страница на которую редирект>Page Example</router-link></li>
+
+
+1) Правильный вариант оформления ссылок ::
+
+ <li v-for="(link, index) in links" :key="link.title">
+    <router-link href="#" class="text-white" :title="link.title" :to="link.url">
+    {{link.title}}
+    </router-link>
+</li>
+
+
+
+<script>
+export default {
+    data() {
+        return {
+            links: [
+                {
+                    title: 'Home',
+                    url: '/'
+                },
+                  {
+                    title: 'Example',
+                    url: '/example'
+                },
+            ],
+        }
+    },
+}
+</script>
+
+
+___________________________________________________________________________________________________________________
+
+Активные ссылки ::
+
+Класс router-link-exact-active в Vue JS служит как активный класс посещения указанной страницы
+
+1)  
+
+<li v-for="(link) in links" :key="link.title">
+                <router-link href="#" class="nav-link" :to="link.url">
+                {{link.title}}
+                </router-link>
+</li>
+
+
+2) 
+
+
+<style lang="scss" scoped>
+
+
+.nav-link {
+    &.router-link-exact-active {
+        color: rgb(255, 255, 255);
+        font-weight: 800;
+        text-shadow: 2px 3px 6px 3px;
+    }
+}
+
+</style>
+
+___________________________________________________________________________________________________________________
+
+Как убирать хэш в приложении :: #
+
+1) в файле routes.js добавить mode: 'history'
+
+
+export default new Router ({
+    mode: 'history', <= <= <=
+    routes: [
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/example',
+            name: 'example',
+            component: Example
+        },
+        {
+            path: '*',
+            name: 'NotFound',
+            component: NotFound
+        },
+    ]
+})
+
+Примечание: хэш проставляется в обязательном порядке, если страницы на сервере находятся в отдельной папке, поэтому в таком случае желательно использовать хэш для корректной работы приложения и роутов.
+
+
+___________________________________________________________________________________________________________________
+
+Vuex ::
+
+Установка Vuex ::	щ
+
+1) npm install vuex --save
+
+2) Переходим в папку main.js и прописываем::
+
+import Vue from 'vue'
+import App from './App.vue'
+
+import router from './routes'
+import store from './store' <= <= <= импортируем
+
+Vue.config.productionTip = false
+
+new Vue({
+  router,
+  store, <= <= <= регаем
+  render: function (h) { return h(App) },
+}).$mount('#app')
+
+
+
+Store - это и есть Vuex, так как там мы и храним все данные
+
+3) Создаем в src => папку store => в ней создаем файл => index.js
+
+4) В файле index.js прописываем ::
+
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+    state: {},
+    mutations: {},
+    actions: {},
+    getters: {},
+})
+
+
+Итак ::
+
+1) state: {} - служит для того чтобы хранить в нем данные!
+2) mutation: {} - служит для того чтобы изменять данные в state {}!
+
+state: {
+        message: 'hello Vuex'
+    },
+    mutations: {
+        setMessage (state, payload) { <= функции для изменения state c 
+            state.message = 'hello world!';
+        }
+    },
+
+3) actions {} - служит для того чтобы изменять state, так как напрямую через moutation мы сделать этого не можем, следовательно мы используем actions
+
+   actions: {
+        setMessage ({commit}) { <= здесь указываем навзание функции как навазние мутации котоорую мы хотим изменить
+            commit('setMessage') <= здесь в кавычках также точное навазание мутации которые мы хотим изменить
+        }
+    },
+
+4) getters: {}  - это концепция ООП JS, (геттеры), 
+
+Примечание! mutation: {} and actions: {}  = это в ООП JS равнозначное понимание сеттеры!
+
+getters: {
+        getMessage (state) {
+            return state.message;
+        }
+    },
+
+
+___________________________________________________________________________________________________________________
+
+
+Вывод данных из state ::
+
+Обращение к стору происходит через: $store
+
+<script>
+export default {
+     computed: {
+      getMessage () {
+        return this.$store.getters.getMessage;
+    }
+  },
+}
+</script>
+
+Вывод в компоненте ::
+
+<template>
+
+{{getMessage}}
+
+<template/>
+
+
+Обращение к atcions :: производится через dispatch('')
+
+methods: {
+    setMessage () {
+      this.$store.dispatch('setMessage');
+    },
+  },
+
+Вторым параметром функции dispatch принимает те данные, которые мы хотим передать!
+
+this.$store.dispatch('setMessage', this.message);
+
+ mutations: {
+        setMessage (state, payload) { <== вот мы их инициализируем 
+            state.message = payload;
+        }
+    }, 
+    actions: {
+        setMessage ({commit}, payload) {  <= здесь асинхроннно принимаем	
+            commit('setMessage', payload)
+        }
+    },
+
+
+___________________________________________________________________________________________________________________
+
+Модульность Vuex ::
+
+
+1) Создаем модуль moduleMessage.js в той же папке со след. содержимым:
+
+
+export default {
+    state: {
+        
+    },
+    mutations: {
+       
+    }, 
+    actions: {
+        
+    },
+    getters: {
+       
+    },
+}		
+
+
+2) 
+
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+// Импортируем модуль <= <=
+import moduleMessage from './moduleMessage'
+
+export default new Vuex.Store({
+    modules: {
+        moduleMessage,
+        ...,
+        ...,
+    },
+
+    state: {
+
+    },
+
+    mutation: {
+    
+    }
+})
+
+
+___________________________________________________________________________________________________________________
+
+Как забаиндить картинку в state Vuex ::
+
+state: {
+        shopList: [
+            {
+                id: 1, 
+                title: 'Nike Red', 
+                descr: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto obcaecati et corporis eaque aspernatur! Quod at amet omnis minus sequi officia et laboriosam, quidem, quae accusamus nemo nulla autem saepe.',
+                img: require('../assets/img/1.png'), <= <= <=
+            }
+        ],
+    },
+
+
+В динамических роутах можно отображать id продукта:
+
+		{
+            path: '/shop/:id',
+            name: 'product',
+            component: Product
+        },
+
+___________________________________________________________________________________________________________________
+
+Настройка Webpack ::
+
+{{ 
+
+Примечание!!! Как понизить версию пакетов в webpack ::
+	
+	npm install webpack@2.1.0
+	
+}}
+
+
+1) Создаем путую папку :: webpackTemplate
+2) npm init => enter
+3) description :: My template
+3) test command :: test
+4) ...
+
+Далее устонавливаем webpack ::
+
+1) npm install webpack webpack-cli webpack-dev-server path --save-dev
+2) После установки заходим в package.json => прописываем в суриптах ::
+
+"scripts": {
+    "dev": "webpack-dev-server --open --mode development",
+    "build": "webpack --mode production"
+  },
+
+3) Создаем в главной папке webpack.config.js ::
+
+
+const path = require('path');
+
+module.exports = {
+    // Точка входа
+    entry: {
+        app: './src/index.js'
+    },
+    // Точка выхода
+    output: {   
+        filename: "[name].js",
+        path: path.resolve(__dirname, './dist'),
+        publicPath: './dist'
+    },
+
+    devServer: {
+        // Отвечает за показ ошибок (вкл):
+        overlay: true,
+    },
+
+}
+
+
+4) Создаем в корневой папке :: index.html
+
+и внизу подключаем ::
+
+<script src="/dist/app.js"></script>
+
+</body>
+</html>
+
+5) для складирования всех фалов js => создаем в папке src => папук js => в ней common.js => в index.js импортируем common.js
+
+6) Запускам webpack в режиме разработки :: 
+
+npm run dev
+
+7) Запускам webpack в режиме production :: 
+
+npm run build
+
+8) Устонавливаем babel ::
+ 
+npm install --save-dev babel-core babel-preset-env
+
+
+___________________________________________________________________________________________________________________
+
+Как подключить Vue к Webpack ::
+
+1) npm install vue --save
+___________________________________________________________________________________________________________________
+
+
+Оптимизация Java Script кода ::			{Сплиты ::}
+
+Теория ::
+вес: 1.5mb			вес: 25kb
+vue.js            {код который мы написали, например expample.vue}
+graphs.js
+bootsrtap.js
+
+^^						^^
+||						||
+
+vendors.js              app.js
+
+
+Что происходит ? При запросе пользователя на изменение каких либо данных в в наших файлах {example.vue} => код java script будет обработан вместе с нашими библиотеками (vue.js итд), что значительно замедлит загрузку! Чтобы этого не просходило мы разделяем наш итоговый файл js как app.js (наши пользовательские скрипты), а файл с библотеками кладем в vendors.js - это и называется сплит.
+
+webpack.base.config.js :: 
+
+
+ optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          name: 'vendors',
+          test: /node_modules/,
+          chunks: 'all',
+          enforce: true
+        }
+      }
+    }
+  }, 
+
+
+___________________________________________________________________________________________________________________
+
+Как подключить Bootsrtap к Webpack ::
+
+1) npm install bootstrap
+	
+2) В файл, который ялвяется точкой входа проекта => index.js ::
+
+
+import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
+
+3) Запускаешь npm run build - это нужно чтобы забилдить наши изменения впроект и они применились!
+
+4) И потом npm run dev
+
+
+
+___________________________________________________________________________________________________________________
+
+REST API ::
+
+
+SITE.COM/USERS		CORS - система безопасности API, которая предотвращает любые изменения в БД сторонних сервисов
+					TOKEN - уникальная система защиты работаю по ключам
+
+___________________________________________________________________________________________________________________
+
+Установка библиотеки axios ::
+
+1) npm install axios --save
+
+
+
+
+Структура запроса axios ::
+писать именно так с новой строки!
+
+
+2) import axios from 'axios' 	<= импортируем axios в тот компонент где мы будем его использовать
+
+created () {
+
+        axios
+        .get('https://jsonplaceholder.typicode.com/users') <= данная функция получает данные
+            .then((response) => {
+            
+        })
+                .catch((value) => {   	<= данная функция ловит ошибки
+                    
+                })
+
+                	
+
+        
+    },
+
+
+___________________________________________________________________________________________________________________
+
+
+Деплой проекта  VueJS CLI :: обязательно указать! В файле vue.config.js
+
+
+1) module.exports = {
+    publicPath: process.env.NODE_ENV === 'production'  <==
+    ? ''   <==
+    : '/',   <==
+    css: {
+        loaderOptions: {
+            sass: {
+                additionalData: ' @import "@/assets/scss/main.scss";'
+            }
+        }
+    },
+       
+}
+
+___________________________________________________________________________________________________________________
+___________________________________________________________________________________________________________________
+
+Установка Nuxt.js ::
+
+1) cd Web => cd vue-projects :: выбираем папку где хотим создать проект Nuxt.js
+2) npm init-nuxt-app <название проекта>
+3) npm run dev <= запускаем проект nuxt.js
+
+
+___________________________________________________________________________________________________________________
+
+Динамичесие роуты в Nuxt.js ::
+
+Роуты в Nuxt создаются автоматически, для их запуска необходимо всего лишь ::
+
+1) В папке pages создать нгапример папку posts => с файлом index.js => это и есть наша новая страница и в адресной сторке прописать: localhost:3000/posts
+
+2) Для создания динамических роутов по id :: 
+    Создаем папку _id => в нее кладем файл index.js
+        Чтобы посмотреть какая страница открыта, проппишем ::
+
+    <template>
+        <div>
+            <h1>post id is {{ $route.params.id }}</h1>
+        </div>
+    </template>
+
+3) Чтобы валидировать введнные значения используем функцию ::
+
+<script>
+export default {
+    validate ({params}) {
+        // Number !
+        return /^\d+$/.test(params.id); 
+    },
+}
+</script>
+
+___________________________________________________________________________________________________________________
+
+Уствновка sass Nuxt.js ::
+
+1) Создаем в папке assets => папку scss => в нее кладем два файла main.scss && variable.scss
+2) Прописываем команды ::
+    npm install sass-loader@8.0.2
+    npm install node-sass@4.13.1
+
+___________________________________________________________________________________________________________________
+
+Подключение шрифтов в Nuxt.js ::
+
+1) Open file nuxt.config.js ::
+2) link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'stylesheet', href: '<ссылка на шрифт>' }
+    ]
+___________________________________________________________________________________________________________________
+
+SSR Nuxt.js ::
+
+1) Чтобы не добавлять блоки в SSR рендеринг, необходимо прописать ::
+
+тег <no-ssr><no-ssr/>
+
+
+<no-ssr>
+    <Intro :title="title" />
+    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cupiditate nihil quaerat, est ut autem mollitia quibusdam maiores aspernatur velit ipsa doloremque cumque vel repellat odio minus error itaque a consequatur.</p>
+</no-ssr>
+
+___________________________________________________________________________________________________________________
+
+Примечание ::
+
+@submit.prevent="onSubmit"
+
+
+@submit.prevent     <= данный метод омтеняет стандартный релоад страницы!
+
+onSubmit        <= в случае если кнопка одна! Тогда по клику будет запускаться эта функция!
+
+___________________________________________________________________________________________________________________
+
+Примечание :: 
+
+В проектах Vue CLI принято создавать папку UI => для хранения в ней различных компонентов, которые будут не раз переиспользованы в проекте
+
+В Nuxt.js статичный файл находится в папке layouts => default.vue   это такой же файл, как по аналогии с App.vue в VueCLI
+
+___________________________________________________________________________________________________________________
+
+Регистрация компонентов Nuxt.js ::
+
+1) Создаем в папке plugins файл с именем ::
+
+    app-components.js
+
+2) В этом файле будем регистрировать компоненты которые мы часто импортируем, в целях избежания итерационного цикла действий используем наш файл ::
+
+import Vue from 'vue'
+
+import AddComment from '@/components/Comments/AddComment.vue'   <= импорт компонентов которые повторяются
+import ButtonControls from '@/components/UI/ButtonControls.vue'     <= импорт компонентов которые повторяются
+import InputsControls from '@/components/UI/InputsControls.vue'         <= импорт компонентов которые повторяются
+import TextareaControls from '@/components/UI/TextareaControls.vue'         <= импорт компонентов которые повторяются
+
+
+Vue.component('AddComment', AddComment)         <= регистрация компонентов
+Vue.component('ButtonControls', ButtonControls)
+Vue.component('InputsControls', InputsControls)
+Vue.component('TextareaControls', TextareaControls)
+
+
+
+3) Регисторируем наш файлик с компонентами в файле nuxt.config.js ::
+
+ // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
+  plugins: [
+    '~plugins/app-components.js'        <= registry
+  ],
+
+___________________________________________________________________________________________________________________
+
+Admin Panel Nuxt.js ::
+
+export default {
+    components: {
+        NewPostForm
+    },
+
+    layout: 'admin',    <= обязательно создаем для страниц admin, чтобы потом проверять явл. ли пользователь админом!
+}
+</script>
+
+
+___________________________________________________________________________________________________________________
+
+Примечание !!! Самый быстрый способ завалидировать поля в Vue JS CLI (Nuxt.js) ::
+
+Добавить компоненту формы параметр :required="required"
+
+
+validate ({params}) {
+        // Number !
+        return /^\d+$/.test(params.id); 
+},
+
+
+___________________________________________________________________________________________________________________
+
+В Nuxt.js позволяет работать с контекстом ::
+
+middleware: ['auth']
+
+В файле => middleware :: 
+
+    хранятся js файлы, которые мы экспортируем в другие модули! 
+
+
+___________________________________________________________________________________________________________________
+
+Асинхронные данные в Nuxt.js ::
+
+Nuxt.js asyncData ::
+
+asyncData () {
+  return new Promise ( (resolve, reject) => {
+     
+  })
+},
+
+
+?????????????????????
+Пояснения ::
+
+resolve     <= отработает тогда когда все впорядке, т.е. данные прошли успешно
+reject      <= отработает тогда когда будут ошибки 
+
+asyncData - работает тогда, когда страница еще не загрузилась! Таким образом acyncData не знает что такое контекст this!
+
+
+?????????????????????
+
+Конструкция асинхронного рендера данных в Nuxt.js ::
+
+
+asyncData (context) {
+  return new Promise ( (resolve, reject) => {
+     setTimeout(() => {
+       resolve ({
+          postsLoaded: [
+            {
+              id: 1,
+              title: '1 post',
+              descr: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum qu',
+              img: 'https://picsum.photos/600/300/?image=41',
+            },
+          ]
+        })
+     }, 1500);
+  })
+    .then(data => {
+      return data;
+    })
+      .catch((e) => {
+        context.error(e);
+      })
+},
+
+___________________________________________________________________________________________________________________
+
+Firebase - это готовый Back для frontend прогеров, удобный, но редко используемый для web (часто используется в мобильной разработке)
+
+
+https://blog-nuxt-55ce5-default-rtdb.firebaseio.com/posts.json      <= обязательно дописываем posts.json
+
+
+___________________________________________________________________________________________________________________
+
+Nuxt.js store ::
+
+    Store Nuxt.js выглядит немного иначе, так как он является более оптимизированным по сравнению с Vue CLI, по след. причинам ::
+        мы экспортируем только то, что непосредственно используем, например можем экспортировать только state и все.
+            также следует заметить, что state - это свмовызывающаяся функция, оаствльное просто обьекты!
+
+
+export const state = () => ({
+
+})
+
+export const mutations = {
+
+}
+
+
+export const actions = {
+    
+}
+
+
+export const getters = {
+    
+}
+
+
+___________________________________________________________________________________________________________________
+
+Firebase :: конструкция замены строки id на числовое значение ::
+
+created() {
+      axios.get('https://blog-nuxt-55ce5-default-rtdb.firebaseio.com/comments.json')  
+        .then((res) => {
+            let commentsArray = []
+            Object.keys(res.data).forEach(key => {
+                const comment = res.data[key]
+                commentsArray.push({...comment, id: key})
+            })
+            console.log(commentsArray);
+        })
+    },
+
+
+___________________________________________________________________________________________________________________
+
+Редиректы в Vue JS CLI && Nuxt.js ::
+
+this.$router.push('/<страница редиректа>')
+
+___________________________________________________________________________________________________________________
+
+Nuxt.js SEO ::
+
+1) Meta теги находятся в файле nuxt.config.js => в теге head ::
+
+ head: {
+    title: 'nuxt-blog',
+    htmlAttrs: {
+      lang: 'en'
+    },
+    meta: [
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    ],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+    ]
+  },
+
+
+2) Создаем на главной странице метод head() :: 
+
+Это позволяет задавать seo оптимизацию для сайта!
+
+head () {
+  let title = 'My App Nuxt!',
+      descr = 'SSR Blog Nuxt.js!',
+      type = 'site'
+
+  return {
+    title: title,
+    meta: [
+      { hid: 'og:title', name: 'og:title', content:  title },
+      { hid: 'description', name: 'description', content:  descr },
+      { hid: 'og:description', name: 'og:description', content:  descr },
+      { hid: 'og:type', name: 'og:type', content:  type },
+    ]
+  }
+},
+
+
+3) Если мы пишем статью, используем обязательно такие параметры :: 
+
+
+ head () {
+    let title = this.post.title,
+      descr = this.post.descr,
+      img = `site.com/${this.post.img}`,  <= та картинка которая появляется на ссылке при сбрасывании ее другим польз.
+      type = 'article'; <= article
+      
+
+  return {
+    title: title,
+    meta: [
+      { hid: 'og:title', name: 'og:title', content:  title },
+      { hid: 'description', name: 'description', content:  descr },
+      { hid: 'og:description', name: 'og:description', content:  descr },
+      { hid: 'og:type', name: 'og:type', content:  type },
+      { hid: 'og:img', name: 'og:img', content:  img },         <= также регаем наши данные!
+    ]
+  }
+},
+
+
+4) robots.txt ::
+    Создаем файл robots.txt в папке static
+
+        И прописываем в него следующее ::
+
+User-agent: *
+Disallow: /admin/
+Disallow: /*.pdf
+Disallow: /*.doc
+Disallow: /*?*
+
+User-agent: Googlebot
+Disallow: /admin/
+Disallow: /*.pdf
+Disallow: /*.doc
+Disallow: /*?*/
+
+User-agent: Yandex
+Disallow: /admin/
+Disallow: /*.pdf
+Disallow: /*.doc
+Disallow: /*?*/ 
+Host: sitehost
+
+
+5) В папке статик, также необходимо создать файл sitemap.xml ::
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+   <url>
+      <loc>http://www.example.com/</loc>
+      <lastmod>2021-01-01</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+   </url>
+
+    <url>
+      <loc>http://www.example.com/blog</loc>
+      <lastmod>2021-01-01</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+   </url>
+
+    <url>
+      <loc>http://www.example.com/about</loc>
+      <lastmod>2021-01-01</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+   </url>
+
+</urlset> 
+
+
+6) Для ускорения скорости загрузки, добавляем часто используемые (импортируемые) библиотеки в файле nuxt.config.js ::
+
+ build: {
+    vendor: [
+      'vue',    <=например 
+      'axios'   <=например
+    ]
+  }
+
+___________________________________________________________________________________________________________________
+
+I__ Deploy в режиме Generate ::
+
+  Данный режим подходит для небольшого сервера или хостинга! То есть например количество постов в месяц не превышает 3-10.
+
+1) Прописываем роуты :: для генерации страниц (nuxt.config.js) ::
+
+ссылка на документацию :: (https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-generate)
+
+import axios from 'axios'
+
+generate: {
+    routes() {
+      return axios.get('https://blog-nuxt-55ce5-default-rtdb.firebaseio.com/posts.json')
+        .then(res => {
+          // Get id
+          const postsArray = [];
+                  for(let key in res.data) { 
+                      postsArray.unshift({ ...res.data[key], id: key })
+                  }
+            // Routes
+            return postsArray.map(post => {
+              return '/blog/' + post.id
+          })
+        })
+    }
+  }
+
+
+2) Запускаем команду :: npm run generate
+
+3) Запушиваем созданную папку dist на сервак
+
+4) Запускаем сервер! И Смотрим!
+
+
+
+II__ Deploy в режиме Server ::
+
+
+ Чтобы проверить данный режим на локальной машине, достаточно запустить двве команды ::
+
+    npm run build
+    npm run start
+
+И посмотреть проект у себя на компе.
+
+Чтобы роект работал на удленном сервере - хостинге, для этого необходимо ::
+
+1) Сервер удаленного хостинга должен поддерживать node.js
+
+2) Создаем директирию на сервере и пушим туда все файлы проекта, кроме файлов ::
+    
+    .nuxt
+    node_modules
+
+3) Открываем удаленный терминал сервера в папке проекта!
+
+4) Запускаем команду :: npm i, для того чтобы сконфигурировалась папка node_modules
+
+5) Дальше запускаем команду :: npm build (данная команда конфигурирует папку .nuxt)
+
+6) Запускаем команду :: npm start => она запустит все файлы в папке .nuxt и отсюда будет работать сервер!
+
+___________________________________________________________________________________________________________________
+
+Локальное хранилище в nuxt.js ::
+
+Ипользуем функцию localStorage в store, для хранения данных на стороне клиента!
+
+ authUser ({commit}, authData) {
+        const key = 'AIzaSyCr37vGqiSdI68Vk_I4UMD_g0NGOvE_swI'
+        return axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${key}`, {  
+            email: authData.email,
+            password: authData.password,
+            returnSecureToken: true
+         })
+            .then((res) => {    
+                let token = res.data.idToken;
+                commit('setToken', token)
+                localStorage,setItem('token', token)
+            })
+    },
+
+___________________________________________________________________________________________________________________
+
+Cookie Nuxt.js ::  Используем библиотеку js-cookie
+
+Для установки библиотеки используем команду ::
+
+npm install --save js-cookie
+
+
+
+Send cookie :: 
+
+
+
+Cookie.set('jwt', )
+
+___________________________________________________________________________________________________________________
+
+Nuxt.js animation page ::
+
+1) Создаем файл main.css в assets и добавляем следующие анимации :: 
+
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.5s;
+}
+.page-enter,
+.page-leave-to {
+  opacity: 0;
+}
+
+2) в nuxt.config.js ::
+
+export default {
+  css: ['~/assets/main.css']
+}
+
+___________________________________________________________________________________________________________________
